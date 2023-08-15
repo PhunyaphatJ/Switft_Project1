@@ -106,6 +106,11 @@ func showDetail(){
 }
 
 
+func pause(){
+    print("Enter someThing....",terminator:"")
+    _ = readLine()
+}
+
 var main = true
 while main {
     system("clear")
@@ -122,14 +127,19 @@ while main {
         switch input {
         case "1":
             addItem()
+            pause()
         case "2":
             remove()
+            pause()
         case "3":
             showDetail()
+            pause()
         case "4":
             main = false
+            pause()
         default:
             print("Invalid input.")
+            pause()
         }
     }
 }
