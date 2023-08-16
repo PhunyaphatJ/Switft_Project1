@@ -25,7 +25,6 @@ func addItem(){
     while(price == nil){
         print("Price each: ",terminator:"")
         if let pri = Double(readLine()!){
-            print(pri)
             price = pri
         }else{
             print("price must be Double")
@@ -42,6 +41,12 @@ func checkArray(index:Int)->Bool{
     return index >= items.count ? false : true
 }
 
+func decreassId(index:Int){
+    for i in index..<items.count{//id after element index - 1
+        items[i].id -= 1
+    }
+    id -= 1
+}
 
 //romove Item
 func remove(){
@@ -78,7 +83,17 @@ func remove(){
 }
 
 func removeByText(){
-    print("1")
+    system("clear")
+    if let input = readLine(){
+        for i in 0..<items.count{
+            if(items[i].name == input){
+                let remove = items.remove(at:i)
+                print("remove Id:\(i) name:\(input) ",remove)
+                decreassId(index:i)
+                break
+            }
+        }
+    }
 }
 
 
@@ -95,10 +110,7 @@ func removeByID(){
             if checkArray(index:input){//if found remove this index if not continue loop
                 let remove = items.remove(at:input)
                 print("remove Id:\(input) :",remove)
-               for i in input..<items.count{//id after element index - 1
-                items[i].id -= 1
-               }
-               id -= 1
+                decreassId(index:input)
                 check = false
             }else{
                 print("not found this index")
