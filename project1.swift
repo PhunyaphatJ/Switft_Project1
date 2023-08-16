@@ -52,7 +52,7 @@ func decreassId(index:Int){
 func remove(){
     if(items.isEmpty){
         print("items is empty cannot remove")
-        pause()
+        pauseFunc()
         return
     }
     system("clear")
@@ -134,7 +134,7 @@ func showDetail(){
 }
 
 
-func pause(){
+func pauseFunc(){
     print("Enter someThing....",terminator:"")
     _ = readLine()
 }
@@ -154,18 +154,18 @@ while main {
         switch input {
         case "1":
             addItem()
-            pause()
+            pauseFunc()
         case "2":
             remove()
-            pause()
+            pauseFunc()
         case "3":
             showDetail()
-            pause()
+            pauseFunc()
         case "4":
             main = false
         default:
             print("Invalid input.")
-            pause()
+            pauseFunc()
         }
     }
 }
