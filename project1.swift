@@ -12,6 +12,32 @@ items.append((id:4,name:"items5",quantity:35,price:33.3))
 
 var id:Int = 0
 
+
+func createAndRemove(){
+    while true{
+    system("clear")
+    print("+-----------------+")
+    print("| Select Option   |")
+    print("| 1.Create Item   |")
+    print("| 2.Remove Item   |")
+    print("| 3.Exit          |")
+    print("+-----------------+")
+    if let input = readLine(){
+        switch input{
+            case "1":
+                addItem()
+            case "2":
+                remove()
+            case "3":
+                return
+            default:
+                print("invalide input")
+        }
+    }
+    }
+}
+
+
 //add function
 func addItem(){
     system("clear")
@@ -23,7 +49,7 @@ func addItem(){
     let name = readLine()!
     
     var quantity:Int?
-    //check input quantity if not Int ,loop until input correct value
+    //check input quantity if not Int ,loop until input is int
     while(quantity == nil){
         print("Quantity: ",terminator:"")
         if let input = Int(readLine()!){
@@ -53,6 +79,8 @@ func addItem(){
     }
     
     let newItem = (id:id,name:name,quantity:quantity!,price:price!)
+    print("add item:\(newItem)")
+    pauseFunc()
     items.append(newItem)
     id += 1//every create item id + 1
 }
@@ -89,7 +117,6 @@ func remove(){
             switch input{
                 case "1":
                     removeByName()
-                    pauseFunc()
                 case "2":
                     removeByID()
                     pauseFunc()
@@ -102,9 +129,6 @@ func remove(){
             print("invalide input ")
         }
     }while(check == false)
-    
-    
-    
 }
 
 
@@ -160,10 +184,12 @@ func show(){
     while check{
         system("clear")
         print("+-----------------+")
+        print("| Select Show     |")
         print("| 1.ShowAllItem   |")
         print("| 2.ShowByID      |")
         print("| 3.ShowByName    |")
-        print("| 4.exit          |")
+        print("| 4.CheckStock    |")
+        print("| 5.exit          |")
         print("+-----------------+")
         if let input = readLine(){
             switch input{
@@ -176,6 +202,9 @@ func show(){
                     showByName()
                     pauseFunc()
                 case "4":
+                    checkStock()
+                    pauseFunc()
+                case "5":
                     check = false
                 default:
                     print("invalid input")
@@ -185,14 +214,11 @@ func show(){
     }
 }
 
-
-//show item
-func showDetail(){
-    system("clear")
+func showAll(thisItems:[(id:Int,name:String,quantity:Int,price:Double)]){
     print("+----------------------------------------+")
     print("| ID |   Name   |   Quantity   |  Price  |")
     print("------------------------------------------")
-    for item in items{
+    for item in thisItems{
        let pID = "\(item.id)".padding(toLength: 4, withPad: " ", startingAt: 0)
        let pName = item.name.padding(toLength: 10, withPad: " ", startingAt: 0)
        let pQuantity = "\(item.quantity)".padding(toLength: 14, withPad: " ", startingAt: 0)
@@ -200,6 +226,12 @@ func showDetail(){
        print("|\(pID)|\(pName)|\(pQuantity)|\(pPrice)|")
        print("------------------------------------------")
     }
+}
+
+//show item
+func showDetail(){
+    system("clear")
+    showAll(thisItems:items)
 }
 
 //ShowByID
@@ -237,12 +269,21 @@ func showByName(){
     }
 }
 
+//chekcstock sorted by items.quantity min
+func checkStock(){
+    system("clear")
+    print("+------------+")
+    print("| CheckStock |")
+    print("+------------+")
+    let quantitySort = items.sorted(by: {$0.quantity < $1.quantity})
+    showAll(thisItems: quantitySort)
+}
 
+//pasuse fucntion
 func pauseFunc(){
     print("Enter someThing....",terminator:"")
     _ = readLine()
 }
-
 
 var main = true
 while main {
@@ -250,20 +291,19 @@ while main {
     print("+-----------------+")
     print("| Select Option:  |")
     print("+-----------------+")
-    print("| 1.Create Item   |")
-    print("| 2.remove Item   |")
-    print("| 3.Show Detail   |")
-    print("| 4.              |")
+    print("| 1.Create /Remove|")
+    print("| 2.Show Items    |")
+    print("| 3.              |")
+    print("| 4.Exit          |")
     print("+-----------------+")
     if let input = readLine() {
         switch input {
         case "1":
-            addItem()
-            pauseFunc()
+            createAndRemove()
         case "2":
-            remove()
-        case "3":
             show()
+        case "3":
+            print("3")
         case "4":
             main = false
         default:
