@@ -1,5 +1,6 @@
 import Foundation
 
+
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
@@ -149,22 +150,32 @@ func removeByID(){
 }
 
 
-// func show(){
-//     system("clear")
-//     var check = true
-//     while check{
-//         print("+---------------------------+")
-//         print("1.ShowDetail")
-//         print("2.ShowByID")
-//         print("3.ShowByName")
-//         if let input = readLine(){
-//             switch input{
-//                 case "1":
-//                     print()
-//             }
-//         }
-//     }
-// }
+func show(){
+    system("clear")
+    var check = true
+    while check{
+        system("clear")
+        print("+---------------------------+")
+        print("1.ShowAllItem")
+        print("2.ShowByID")
+        print("3.ShowByName")
+        if let input = readLine(){
+            switch input{
+                case "1":
+                    showDetail()
+                    pauseFunc()
+                case "2":
+                    showByID()
+                case "3":
+                    showByName()
+                    pauseFunc()
+                default:
+                    print("invalid input")
+                    pauseFunc()
+            }
+        }
+    }
+}
 
 
 //show item
@@ -180,6 +191,35 @@ func showDetail(){
        let pPrice = "\(item.price)".padding(toLength: 9, withPad: " ", startingAt: 0)
        print("|\(pID)|\(pName)|\(pQuantity)|\(pPrice)|")
        print("------------------------------------------")
+    }
+}
+
+//ShowByID
+func showByID(){
+    system("clear")
+    print("Input item ID: ",terminator: "")
+    if let input = Int(readLine()!){
+        if checkArray(index: input){
+          print("\nID: \(items[input].id) Name: \(items[input].name) Quantity: \(items[input].quantity) price: \(items[input].price)\n")
+        }else{
+            print("not found this index")
+        }
+    }
+    pauseFunc()
+}
+
+//ShowByName
+func showByName(){
+    system("clear")
+    print("Input Name: ",terminator: "")
+    if let input = readLine(){
+        for item in items{
+            if item.name == input{
+                print("\nID: \(item.id) Name: \(item.name) Quantity: \(item.quantity) price: \(item.price)\n")
+                return
+            }
+        }
+        print("not found")
     }
 }
 
@@ -209,8 +249,7 @@ while main {
         case "2":
             remove()
         case "3":
-            showDetail()
-            pauseFunc()
+            show()
         case "4":
             main = false
         default:
