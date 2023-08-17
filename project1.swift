@@ -1,5 +1,6 @@
 import Foundation
 
+
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
@@ -13,6 +14,10 @@ var id:Int = 0
 
 //add function
 func addItem(){
+    system("clear")
+    print("+------------+")
+    print("|   addItem  |")
+    print("+------------+")
     print("Enter item[\(id)] details:")
     print("Name: ",terminator:"")
     let name = readLine()!
@@ -74,12 +79,12 @@ func remove(){
     var check = false
     repeat{
         system("clear")
-        print("+------------------+")
-        print("| Select remove    |")
-        print("| 1.remove by Name |")
-        print("| 2.remove by ID   |")
-        print("| 3.exit           |")
-        print("+------------------+")
+        print("+--------------------+")
+        print("| Select remove      |")
+        print("| 1.remove by Name   |")
+        print("| 2.remove by ID     |")
+        print("| 3.exit             |")
+        print("+--------------------+")
         if let input = readLine(){
             switch input{
                 case "1":
@@ -107,7 +112,7 @@ func remove(){
 func removeByName(){
     system("clear")
     print("+------------+")
-    print("| removeByID |")
+    print("|removeByName|")
     print("+------------+")
     print("Input Name: ",terminator: "")
     if let input = readLine(){
@@ -149,22 +154,36 @@ func removeByID(){
 }
 
 
-// func show(){
-//     system("clear")
-//     var check = true
-//     while check{
-//         print("+---------------------------+")
-//         print("1.ShowDetail")
-//         print("2.ShowByID")
-//         print("3.ShowByName")
-//         if let input = readLine(){
-//             switch input{
-//                 case "1":
-//                     print()
-//             }
-//         }
-//     }
-// }
+func show(){
+    system("clear")
+    var check = true
+    while check{
+        system("clear")
+        print("+-----------------+")
+        print("| 1.ShowAllItem   |")
+        print("| 2.ShowByID      |")
+        print("| 3.ShowByName    |")
+        print("| 4.exit          |")
+        print("+-----------------+")
+        if let input = readLine(){
+            switch input{
+                case "1":
+                    showDetail()
+                    pauseFunc()
+                case "2":
+                    showByID()
+                case "3":
+                    showByName()
+                    pauseFunc()
+                case "4":
+                    check = false
+                default:
+                    print("invalid input")
+                    pauseFunc()
+            }
+        }
+    }
+}
 
 
 //show item
@@ -183,6 +202,41 @@ func showDetail(){
     }
 }
 
+//ShowByID
+func showByID(){
+    system("clear")
+    print("+------------+")
+    print("| showByID   |")
+    print("+------------+")
+    print("Input item ID: ",terminator: "")
+    if let input = Int(readLine()!){
+        if checkArray(index: input){
+          print("\nID: \(items[input].id) Name: \(items[input].name) Quantity: \(items[input].quantity) price: \(items[input].price)\n")
+        }else{
+            print("not found this index")
+        }
+    }
+    pauseFunc()
+}
+
+//ShowByName
+func showByName(){
+    system("clear")
+    print("+------------+")
+    print("| showByName |")
+    print("+------------+")
+    print("Input Name: ",terminator: "")
+    if let input = readLine(){
+        for item in items{
+            if item.name == input{
+                print("\nID: \(item.id) Name: \(item.name) Quantity: \(item.quantity) price: \(item.price)\n")
+                return
+            }
+        }
+        print("not found")
+    }
+}
+
 
 func pauseFunc(){
     print("Enter someThing....",terminator:"")
@@ -198,8 +252,8 @@ while main {
     print("+-----------------+")
     print("| 1.Create Item   |")
     print("| 2.remove Item   |")
-    print("| 3.Add Item      |")
-    print("| 3.show Detail   |")
+    print("| 3.Show Detail   |")
+    print("| 4.              |")
     print("+-----------------+")
     if let input = readLine() {
         switch input {
@@ -209,8 +263,7 @@ while main {
         case "2":
             remove()
         case "3":
-            showDetail()
-            pauseFunc()
+            show()
         case "4":
             main = false
         default:
