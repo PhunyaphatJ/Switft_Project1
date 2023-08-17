@@ -1,6 +1,14 @@
 import Foundation
 
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
+//for test
+items.append((id:0,name:"items1",quantity:30,price:20.0))
+items.append((id:1,name:"items2",quantity:15,price:50))
+items.append((id:2,name:"items3",quantity:5,price:5))
+items.append((id:3,name:"items4",quantity:60,price:15))
+items.append((id:4,name:"items5",quantity:35,price:33.3))
+//
+
 var id:Int = 0
 
 //add function
@@ -13,8 +21,12 @@ func addItem(){
     //check input quantity if not Int ,loop until input correct value
     while(quantity == nil){
         print("Quantity: ",terminator:"")
-        if let quanti = Int(readLine()!){
-            quantity = quanti
+        if let input = Int(readLine()!){
+            if input < 0{ //check input < 0
+                print("Quantity must more than 0")
+            }else{
+            quantity = input
+            }
         }else{
             print("quantity must be Int")
         }
@@ -24,8 +36,12 @@ func addItem(){
     //check input price
     while(price == nil){
         print("Price each: ",terminator:"")
-        if let pri = Double(readLine()!){
-            price = pri
+        if let input = Double(readLine()!){
+            if input <= 0{
+                print("pirce must more than 0")
+            }else{
+            price = input
+            }
         }else{
             print("price must be Double")
         }
@@ -40,8 +56,8 @@ func addItem(){
 func checkArray(index:Int)->Bool{
     return index >= items.count ? false : true
 }
-
-func decreassId(index:Int){
+//decrease
+func decreaseID(index:Int){
     for i in index..<items.count{//id after element index - 1
         items[i].id -= 1
     }
@@ -55,19 +71,23 @@ func remove(){
         pauseFunc()
         return
     }
-    system("clear")
     var check = false
     repeat{
-        print("Select remove")
-        print("1.remove by text")
-        print("2.remove by ID")
-        print("3.exit")
+        system("clear")
+        print("+------------------+")
+        print("| Select remove    |")
+        print("| 1.remove by Name |")
+        print("| 2.remove by ID   |")
+        print("| 3.exit           |")
+        print("+------------------+")
         if let input = readLine(){
             switch input{
                 case "1":
-                    removeByText()
+                    removeByName()
+                    pauseFunc()
                 case "2":
                     removeByID()
+                    pauseFunc()
                 case "3":
                     check = true
                 default:
@@ -82,22 +102,29 @@ func remove(){
     
 }
 
-func removeByText(){
+
+//removeByName
+func removeByName(){
     system("clear")
+    print("+------------+")
+    print("| removeByID |")
+    print("+------------+")
+    print("Input Name: ",terminator: "")
     if let input = readLine(){
         for i in 0..<items.count{
-            if(items[i].name == input){
+            if(items[i].name == input){//check input if found remove 
                 let remove = items.remove(at:i)
                 print("remove Id:\(i) name:\(input) ",remove)
-                decreassId(index:i)
-                break
+                decreaseID(index:i)
+                return
             }
         }
+        print("items dont have item name \(input)")
     }
 }
 
 
-//remove array by ID
+//removeBy ID
 func removeByID(){
     system("clear")
     var check = true
@@ -110,7 +137,7 @@ func removeByID(){
             if checkArray(index:input){//if found remove this index if not continue loop
                 let remove = items.remove(at:input)
                 print("remove Id:\(input) :",remove)
-                decreassId(index:input)
+                decreaseID(index:input)
                 check = false
             }else{
                 print("not found this index")
@@ -121,15 +148,38 @@ func removeByID(){
     }
 }
 
+
+// func show(){
+//     system("clear")
+//     var check = true
+//     while check{
+//         print("+---------------------------+")
+//         print("1.ShowDetail")
+//         print("2.ShowByID")
+//         print("3.ShowByName")
+//         if let input = readLine(){
+//             switch input{
+//                 case "1":
+//                     print()
+//             }
+//         }
+//     }
+// }
+
+
 //show item
 func showDetail(){
     system("clear")
-    print("+------------------------------+")
-    print("| ID |   Name   |   Quantity   |")
-    print("--------------------------------")
+    print("+----------------------------------------+")
+    print("| ID |   Name   |   Quantity   |  Price  |")
+    print("------------------------------------------")
     for item in items{
-        print("\(item.id)|\(item.name)| \(item.quantity)|")
-        print("---------------------------")
+       let pID = "\(item.id)".padding(toLength: 4, withPad: " ", startingAt: 0)
+       let pName = item.name.padding(toLength: 10, withPad: " ", startingAt: 0)
+       let pQuantity = "\(item.quantity)".padding(toLength: 14, withPad: " ", startingAt: 0)
+       let pPrice = "\(item.price)".padding(toLength: 9, withPad: " ", startingAt: 0)
+       print("|\(pID)|\(pName)|\(pQuantity)|\(pPrice)|")
+       print("------------------------------------------")
     }
 }
 
@@ -138,6 +188,7 @@ func pauseFunc(){
     print("Enter someThing....",terminator:"")
     _ = readLine()
 }
+
 
 var main = true
 while main {
@@ -157,7 +208,6 @@ while main {
             pauseFunc()
         case "2":
             remove()
-            pauseFunc()
         case "3":
             showDetail()
             pauseFunc()
