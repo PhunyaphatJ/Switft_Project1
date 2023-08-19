@@ -2,6 +2,7 @@ import Foundation
 
 var user:[(id:String,password:String)] = [(id:"Joe",password:"123")]
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
+var sellList:[[(id:Int,name:String,quantity:Int,price:Double)]] = []
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
 items.append((id:1,name:"items2",quantity:15,price:50))
@@ -96,6 +97,18 @@ func decreaseID(index:Int){
         items[i].id -= 1
     }
     id -= 1
+}
+
+//checkID
+func checkID(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],id:Int)->Int{
+    var i = 0
+    for item in thisItems{
+        if item.id == id {
+            break
+        }
+        i = i + 1
+    }
+    return i
 }
 
 //--------------remove-----------------------
@@ -301,6 +314,8 @@ func seller(){
             switch input{
                 case "1":
                     sellItem()
+                case "3":
+                    return
                 default:
                     print("error")
             }
@@ -313,46 +328,66 @@ func bill(){
 }
 
 func sellItem(){
-    system("clear")
+    var check = true
+    var bill:[(id:Int,name:String,quantity:Int,price:Double)] = []
+    // system("clear")
     print("+------------+")
     print("|  SellItem  |")
     print("+------------+")
-    showAll(thisItems: items)
-    sell:while true{
+    sell:repeat {
+        showAll(thisItems: items)
+        showAll(thisItems: bill)
         print("Do You want to sell (Y|N): ",terminator: "")
         if let input = readLine(){
             switch input{
                 case "Y","y":
                     print("sell Item ID: ",terminator: "")
                     if let inputID = Int(readLine()!){
-                        if items.contains(where: {$0.id == inputID}){
-                            quantityLoop:while true{
-                                print("Quantity: ",terminator: "")
-                                if let inputQuantity = Int(readLine()!){
-                                    if items[inputID].quantity >=  inputQuantity{
-                                    print("yes")
-                                    break quantityLoop
-                                }else{
-                                        print("input Quantity > Quantity")
-                                    }
-                                }else{
-                                    print("quantity must be Int")
-                                    continue quantityLoop
-                                }
-                            }
+                        let indexA = checkID(thisItems: items, id: inputID)
+                        if items[indexA].quantity == 0{
+                            print("items is empty")
+                            pauseFunc()
                         }else{
-                            print("no items id")
+                            if items.contains(where: {$0.id == inputID}){
+                                quantityLoop:while true{
+                                    print("Quantity: ",terminator: "")
+                                    if let inputQuantity = Int(readLine()!){
+                                        if items[indexA].quantity >=  inputQuantity{
+                                            if bill.contains(where: {$0.id == inputID}){
+                                                let indexB = checkID(thisItems: bill, id: inputID)
+                                                bill[indexB].quantity += inputQuantity
+                                            }else{
+                                                let price = Double(inputQuantity) * items[indexA].price
+                                                bill.append((id:inputID,name:items[indexA].name,quantity:inputQuantity,price))
+                                            } 
+                                            items[indexA].quantity -= inputQuantity
+                                            break quantityLoop
+                                        }else{
+                                            print("input Quantity > Quantity")
+                                            continue quantityLoop
+                                        }
+                                        continue sell
+                                    }else{
+                                        print("quantity must be Int")
+                                        continue quantityLoop
+                                    }
+                                }
+                            }else{
+                                print("no items id")
+                            }
                         }
                     }else{
                         print("Id must be Int")
                     }
-                case "N","n":
-                    break sell
+                case "3":
+                    check = false
                 default:
                     print("error")
             }
         }        
-    }
+    }while check
+    sellList.append(bill)
+    print(sellList)
     pauseFunc()
 }
 
