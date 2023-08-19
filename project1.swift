@@ -1,6 +1,6 @@
 import Foundation
 
-
+var user:[(id:String,password:String)] = [(id:"Joe",password:"123")]
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
@@ -12,7 +12,7 @@ items.append((id:4,name:"items5",quantity:35,price:33.3))
 
 var id:Int = 0
 
-
+//Create and Remove function
 func createAndRemove(){
     while true{
     system("clear")
@@ -37,7 +37,7 @@ func createAndRemove(){
     }
 }
 
-
+//---------------------add------------------------
 //add function
 func addItem(){
     system("clear")
@@ -84,6 +84,7 @@ func addItem(){
     items.append(newItem)
     id += 1//every create item id + 1
 }
+//------------------end add--------------------
 
 //check array index
 func checkArray(index:Int)->Bool{
@@ -97,6 +98,7 @@ func decreaseID(index:Int){
     id -= 1
 }
 
+//--------------remove-----------------------
 //romove Item
 func remove(){
     if(items.isEmpty){
@@ -176,8 +178,9 @@ func removeByID(){
         }
     }
 }
+//------------------------end remove------------------------
 
-
+//-------------------------show-----------------------------
 func show(){
     system("clear")
     var check = true
@@ -279,12 +282,84 @@ func checkStock(){
     showAll(thisItems: quantitySort)
 }
 
+//------------------end Show---------------------------
+
 //pasuse fucntion
 func pauseFunc(){
     print("Enter someThing....",terminator:"")
     _ = readLine()
 }
 
+
+//-----------------seller------------------------------
+//seller function
+func seller(){
+    while true{
+        system("clear")
+        print("1.Sell Item")
+        if let input = readLine(){
+            switch input{
+                case "1":
+                    sellItem()
+                default:
+                    print("error")
+            }
+        }
+    }
+}
+
+func bill(){
+
+}
+
+func sellItem(){
+    system("clear")
+    print("+------------+")
+    print("|  SellItem  |")
+    print("+------------+")
+    showAll(thisItems: items)
+    sell:while true{
+        print("Do You want to sell (Y|N): ",terminator: "")
+        if let input = readLine(){
+            switch input{
+                case "Y","y":
+                    print("sell Item ID: ",terminator: "")
+                    if let inputID = Int(readLine()!){
+                        if items.contains(where: {$0.id == inputID}){
+                            quantityLoop:while true{
+                                print("Quantity: ",terminator: "")
+                                if let inputQuantity = Int(readLine()!){
+                                    if items[inputID].quantity >=  inputQuantity{
+                                    print("yes")
+                                    break quantityLoop
+                                }else{
+                                        print("input Quantity > Quantity")
+                                    }
+                                }else{
+                                    print("quantity must be Int")
+                                    continue quantityLoop
+                                }
+                            }
+                        }else{
+                            print("no items id")
+                        }
+                    }else{
+                        print("Id must be Int")
+                    }
+                case "N","n":
+                    break sell
+                default:
+                    print("error")
+            }
+        }        
+    }
+    pauseFunc()
+}
+
+//-------------------end seller------------------
+
+
+//main
 var main = true
 while main {
     system("clear")
@@ -293,7 +368,7 @@ while main {
     print("+-----------------+")
     print("| 1.Create /Remove|")
     print("| 2.Show Items    |")
-    print("| 3.              |")
+    print("| 3.Seller        |")
     print("| 4.Exit          |")
     print("+-----------------+")
     if let input = readLine() {
@@ -303,7 +378,7 @@ while main {
         case "2":
             show()
         case "3":
-            print("3")
+            seller()
         case "4":
             main = false
         default:
@@ -312,11 +387,3 @@ while main {
         }
     }
 }
-
-
-
-
-
-
-
-
