@@ -9,9 +9,59 @@ items.append((id:1,name:"items2",quantity:15,price:50))
 items.append((id:2,name:"items3",quantity:5,price:5))
 items.append((id:3,name:"items4",quantity:60,price:15))
 items.append((id:4,name:"items5",quantity:35,price:33.3))
+var id = items.count - 1
 //
 
-var id:Int = 0
+// var id:Int = 0
+
+//-----------------function add-on------------
+//check array index
+func checkArray(index:Int)->Bool{
+    return index >= items.count ? false : true
+}
+
+//checkID
+func checkID(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],id:Int)->Int?{
+    var i = 0
+    for item in thisItems{
+        if item.id == id {
+            return i
+        }
+        i = i + 1
+    }
+    return nil
+}
+
+func checkName(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],name:String)->Int?{
+      for i in 0..<thisItems.count{
+            if(thisItems[i].name == name){
+                return  i
+            }
+        }
+    return nil
+}
+
+//total price in bill
+func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
+    var sum:Double = 0
+    for item in thisItems{
+        sum += item.price
+    }
+     let space = "".padding(toLength: 23, withPad: " ", startingAt: 0)
+     let stringSum = "\(sum)".padding(toLength: 8, withPad: " ", startingAt: 0)
+     print("|\(space)total : \(stringSum) |")
+     print("------------------------------------------")
+     return sum
+}
+
+func showSellList(thisSell:[[(id:Int,name:String,quantity:Int,price:Double)]]){
+    for sell in thisSell{
+        showAll(thisItems: sell)
+    }
+}
+
+//------------------------------------------
+
 
 //Create and Remove function
 func createAndRemove(){
@@ -26,7 +76,7 @@ func createAndRemove(){
     if let input = readLine(){
         switch input{
             case "1":
-                addItem()
+                add()
             case "2":
                 remove()
             case "3":
@@ -39,6 +89,30 @@ func createAndRemove(){
 }
 
 //---------------------add------------------------
+func add(){
+        while true{
+    system("clear")
+    print("+-----------------+")
+    print("| Select Option   |")
+    print("| 1.Add Item      |")
+    print("| 2.Add By ID     |")
+    print("| 3.Exit          |")
+    print("+-----------------+")
+    if let input = readLine(){
+        switch input{
+            case "1":
+                addItem()
+            case "2":
+                addByID()
+            case "3":
+                return
+            default:
+                print("invalide input")
+        }
+    }
+    }
+}
+
 //add function
 func addItem(){
     system("clear")
@@ -85,44 +159,64 @@ func addItem(){
     items.append(newItem)
     id += 1//every create item id + 1
 }
+
+func addByID(){
+    system("clear")
+    print("+-------------+")
+    print("| addItemByID |")
+    print("+-------------+")
+    print("Enter item details:")
+    add:while true{
+        print("ID: ",terminator:"")
+        if let inputID = Int(readLine()!){
+            if let id = checkID(thisItems: items, id: inputID){//check id exist
+                print("This ID already exists ")
+                continue add
+            }else{
+                id = inputID
+                print("Name: ",terminator:"")
+                let name = readLine()!
+
+                var quantity:Int?
+                while(quantity == nil){
+                    print("Quantity: ",terminator:"")
+                    if let inputQuantity = Int(readLine()!){
+                        if inputQuantity < 0{ //check input < 0
+                            print("Quantity must more than 0")
+                        }else{
+                        quantity = inputQuantity
+                    }
+                     }else{
+                        print("quantity must be Int")
+                    }
+                }
+                var price:Double?
+                while(price == nil){
+                    print("Price each: ",terminator:"")
+                    if let inputPrice = Double(readLine()!){
+                        if inputPrice <= 0{
+                            print("pirce must more than 0")
+                        }else{
+                        price = inputPrice
+                        }
+                    }else{
+                        print("price must be Double")
+                    }
+                }
+                let newItem = (id:id,name:name,quantity:quantity!,price:price!)
+                print("add item:\(newItem)")
+                pauseFunc()
+                items.append(newItem)
+                items.sort(by: {$0.id < $1.id})
+                return
+            }
+        }else{
+            print("Id must be Int")
+        }
+    }
+}
 //------------------end add--------------------
 
-//check array index
-func checkArray(index:Int)->Bool{
-    return index >= items.count ? false : true
-}
-//decrease
-func decreaseID(index:Int){
-    for i in index..<items.count{//id after element index - 1
-        items[i].id -= 1
-    }
-    id -= 1
-}
-
-//checkID
-func checkID(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],id:Int)->Int?{
-    var i = 0
-    for item in thisItems{
-        if item.id == id {
-            return i
-        }
-        i = i + 1
-    }
-    return nil
-}
-
-//total price in bill
-func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
-    var sum:Double = 0
-    for item in thisItems{
-        sum += item.price
-    }
-     let space = "".padding(toLength: 23, withPad: " ", startingAt: 0)
-     let stringSum = "\(sum)".padding(toLength: 8, withPad: " ", startingAt: 0)
-     print("|\(space)total : \(stringSum) |")
-     print("------------------------------------------")
-     return sum
-}
 
 //--------------remove-----------------------
 //romove Item
@@ -168,15 +262,14 @@ func removeByName(){
     print("+------------+")
     print("Input Name: ",terminator: "")
     if let input = readLine(){
-        for i in 0..<items.count{
-            if(items[i].name == input){//check input if found remove 
-                let remove = items.remove(at:i)
-                print("remove Id:\(i) name:\(input) ",remove)
-                decreaseID(index:i)
-                return
-            }
+        if let index = checkName(thisItems: items, name: input){
+            let remove = items.remove(at:index)
+            print("remove Id:\(index) name:\(input) ",remove)
+            // decreaseID(index:index)
+        }else{
+            print("items dont have item name \(input)")
         }
-        print("items dont have item name \(input)")
+        pauseFunc()
     }
 }
 
@@ -194,7 +287,7 @@ func removeByID(){
             if checkArray(index:input){//if found remove this index if not continue loop
                 let remove = items.remove(at:input)
                 print("remove Id:\(input) :",remove)
-                decreaseID(index:input)
+                // decreaseID(index:input)
                 check = false
             }else{
                 print("not found this index")
@@ -288,13 +381,11 @@ func showByName(){
     print("+------------+")
     print("Input Name: ",terminator: "")
     if let input = readLine(){
-        for item in items{
-            if item.name == input{
-                print("\nID: \(item.id) Name: \(item.name) Quantity: \(item.quantity) price: \(item.price)\n")
-                return
-            }
+        if let index = checkName(thisItems: items, name: input){
+            print("\nID: \(items[index].id) Name: \(items[index].name) Quantity: \(items[index].quantity) price: \(items[index].price)\n")
+        }else{
+            print("not found")
         }
-        print("not found")
     }
 }
 
@@ -354,21 +445,21 @@ func sellItem(){
         total(thisItems: bill)
         print("Do You want to sell (Y|N): ",terminator: "")
         if let input = readLine(){
-            switch input{
+            switch input{//case y/n 
                 case "Y","y":
                     print("sell Item ID: ",terminator: "")
-                    if let inputID = Int(readLine()!){
-                        if let indexA = checkID(thisItems: items, id: inputID){
-                            if items[indexA].quantity == 0{
+                    if let inputID = Int(readLine()!){//check input Int
+                        if let indexA = checkID(thisItems: items, id: inputID){//check index out of bounds
+                            if items[indexA].quantity == 0{//quantity check
                                 print("items is empty")
                                 pauseFunc()
                             }else{
                                     quantityLoop:while true{
                                         print("Quantity: ",terminator: "")
-                                        if let inputQuantity = Int(readLine()!){
-                                            if items[indexA].quantity >=  inputQuantity{
-                                                if bill.contains(where: {$0.id == inputID}){
-                                                    let indexB = checkID(thisItems: bill, id: inputID)!
+                                        if let inputQuantity = Int(readLine()!){//check input Int
+                                            if items[indexA].quantity >=  inputQuantity{//check inputQuantity > item quantity
+                                                if bill.contains(where: {$0.id == inputID}){//check if bill have item before
+                                                    let indexB:Int! = checkID(thisItems: bill, id: inputID)
                                                     bill[indexB].quantity += inputQuantity
                                                 }else{
                                                     let price = Double(inputQuantity) * items[indexA].price
@@ -399,8 +490,11 @@ func sellItem(){
             }
         }        
     }while check
-    sellList.append(bill)
-    print(sellList)
+    if !bill.isEmpty{
+        sellList.append(bill)//add bill in sellList
+    }
+    showSellList(thisSell: sellList)
+    // print(sellList)
     pauseFunc()
 }
 
