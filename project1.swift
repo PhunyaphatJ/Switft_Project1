@@ -62,7 +62,6 @@ func showSellList(thisSell:[[(id:Int,name:String,quantity:Int,price:Double)]]){
 
 //------------------------------------------
 
-
 //Create and Remove function
 func createAndRemove(){
     while true{
@@ -119,7 +118,7 @@ func addItem(){
     print("+------------+")
     print("|   addItem  |")
     print("+------------+")
-    print("Enter item[\(id)] details:")
+    print("Enter item details:")
     print("Name: ",terminator:"")
     let name = readLine()!
     
@@ -152,11 +151,20 @@ func addItem(){
             print("price must be Double")
         }
     }
-    
+    while true{
+       if checkID(thisItems: items, id: id) != nil{ //check id if exist
+            id += 1
+        }else{
+            break
+        }
+    }
+
+
     let newItem = (id:id,name:name,quantity:quantity!,price:price!)
     print("add item:\(newItem)")
     pauseFunc()
     items.append(newItem)
+    items.sort(by: {$0.id < $1.id})
     id += 1//every create item id + 1
 }
 
@@ -169,11 +177,11 @@ func addByID(){
     add:while true{
         print("ID: ",terminator:"")
         if let inputID = Int(readLine()!){
-            if let id = checkID(thisItems: items, id: inputID){//check id exist
+            if checkID(thisItems: items, id: inputID) != nil{//check id exist
                 print("This ID already exists ")
                 continue add
             }else{
-                id = inputID
+                let thisID = inputID
                 print("Name: ",terminator:"")
                 let name = readLine()!
 
@@ -203,7 +211,7 @@ func addByID(){
                         print("price must be Double")
                     }
                 }
-                let newItem = (id:id,name:name,quantity:quantity!,price:price!)
+                let newItem = (id:thisID,name:name,quantity:quantity!,price:price!)
                 print("add item:\(newItem)")
                 pauseFunc()
                 items.append(newItem)
@@ -413,11 +421,18 @@ func pauseFunc(){
 func seller(){
     while true{
         system("clear")
-        print("1.Sell Item")
+          print("+---------------+")
+        print("| Select Option   |")
+        print("| 1.sell Ite      |")
+        print("| 2.Re Stock      |")
+        print("| 3.Exit          |")
+        print("+-----------------+")
         if let input = readLine(){
             switch input{
                 case "1":
                     sellItem()
+                case "2":
+                    reStock()
                 case "3":
                     return
                 default:
@@ -498,6 +513,36 @@ func sellItem(){
     pauseFunc()
 }
 
+func reStock(){
+    repeat{
+        system("claer")
+        checkStock()
+        print("Input Item ID: ",terminator: "")
+        if let inputID = Int(readLine()!){
+            if let index = checkID(thisItems: items, id: inputID){
+                print("Input Quantity: ",terminator: "")
+                if let inputQuantity = Int(readLine()!){
+                    items[index].quantity += inputQuantity
+                }else{
+                    print("Quantity must be Int")
+                }
+            }else{
+                print("not found this id")
+            }
+        }else{
+            print("ID Must be Int")
+        }
+        print("Do you want to continue [Y|N]: ",terminator: "")
+        if let conti = readLine(){
+            switch conti{
+                case "N","n":
+                    return
+                default:
+                    continue
+            }
+        }
+    }while true
+}
 //-------------------end seller------------------
 
 
