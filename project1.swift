@@ -111,6 +111,19 @@ func checkID(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],id:Int)-
     return nil
 }
 
+//total price in bill
+func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
+    var sum:Double = 0
+    for item in thisItems{
+        sum += item.price
+    }
+     let space = "".padding(toLength: 23, withPad: " ", startingAt: 0)
+     let stringSum = "\(sum)".padding(toLength: 8, withPad: " ", startingAt: 0)
+     print("|\(space)total : \(stringSum) |")
+     print("------------------------------------------")
+     return sum
+}
+
 //--------------remove-----------------------
 //romove Item
 func remove(){
@@ -336,7 +349,9 @@ func sellItem(){
     print("+------------+")
     sell:repeat {
         showAll(thisItems: items)
+        bill.sort(by: {$0.id < $1.id})//sorted id 
         showAll(thisItems: bill)
+        total(thisItems: bill)
         print("Do You want to sell (Y|N): ",terminator: "")
         if let input = readLine(){
             switch input{
