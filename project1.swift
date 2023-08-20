@@ -100,15 +100,15 @@ func decreaseID(index:Int){
 }
 
 //checkID
-func checkID(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],id:Int)->Int{
+func checkID(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],id:Int)->Int?{
     var i = 0
     for item in thisItems{
         if item.id == id {
-            break
+            return i
         }
         i = i + 1
     }
-    return i
+    return nil
 }
 
 //--------------remove-----------------------
@@ -343,38 +343,36 @@ func sellItem(){
                 case "Y","y":
                     print("sell Item ID: ",terminator: "")
                     if let inputID = Int(readLine()!){
-                        let indexA = checkID(thisItems: items, id: inputID)
-                        if items[indexA].quantity == 0{
-                            print("items is empty")
-                            pauseFunc()
-                        }else{
-                            if items.contains(where: {$0.id == inputID}){
-                                quantityLoop:while true{
-                                    print("Quantity: ",terminator: "")
-                                    if let inputQuantity = Int(readLine()!){
-                                        if items[indexA].quantity >=  inputQuantity{
-                                            if bill.contains(where: {$0.id == inputID}){
-                                                let indexB = checkID(thisItems: bill, id: inputID)
-                                                bill[indexB].quantity += inputQuantity
+                        if let indexA = checkID(thisItems: items, id: inputID){
+                            if items[indexA].quantity == 0{
+                                print("items is empty")
+                                pauseFunc()
+                            }else{
+                                    quantityLoop:while true{
+                                        print("Quantity: ",terminator: "")
+                                        if let inputQuantity = Int(readLine()!){
+                                            if items[indexA].quantity >=  inputQuantity{
+                                                if bill.contains(where: {$0.id == inputID}){
+                                                    let indexB = checkID(thisItems: bill, id: inputID)!
+                                                    bill[indexB].quantity += inputQuantity
+                                                }else{
+                                                    let price = Double(inputQuantity) * items[indexA].price
+                                                    bill.append((id:inputID,name:items[indexA].name,quantity:inputQuantity,price))
+                                                } 
+                                                items[indexA].quantity -= inputQuantity
+                                                break quantityLoop
                                             }else{
-                                                let price = Double(inputQuantity) * items[indexA].price
-                                                bill.append((id:inputID,name:items[indexA].name,quantity:inputQuantity,price))
-                                            } 
-                                            items[indexA].quantity -= inputQuantity
-                                            break quantityLoop
+                                                print("input Quantity > Quantity")
+                                                continue quantityLoop
+                                            }
                                         }else{
-                                            print("input Quantity > Quantity")
+                                            print("quantity must be Int")
                                             continue quantityLoop
                                         }
-                                        continue sell
-                                    }else{
-                                        print("quantity must be Int")
-                                        continue quantityLoop
                                     }
                                 }
-                            }else{
-                                print("no items id")
-                            }
+                        }else{
+                            print("dont have this id")
                         }
                     }else{
                         print("Id must be Int")
@@ -397,7 +395,7 @@ func sellItem(){
 //main
 var main = true
 while main {
-    system("clear")
+    // system("clear")
     print("+-----------------+")
     print("| Select Option:  |")
     print("+-----------------+")
