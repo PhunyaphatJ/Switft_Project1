@@ -1,9 +1,9 @@
 import Foundation
 
-var user:[(id:String,password:String)] = [(id:"Joe",password:"123")]
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
 var sellList: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double)] = []
-var order = 0
+typealias AnotherInt = Int
+var order:AnotherInt = 0
 var totalSell:Double = 0
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
@@ -55,6 +55,11 @@ func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
      print("------------------------------------------")
      return sum
 }
+
+// enum Member{
+//     case member = 0,noMember = 1
+// }
+
 
 //------------------------------------------
 
@@ -123,11 +128,11 @@ func addItem(){
     while(quantity == nil){
         print("Quantity: ",terminator:"")
         if let input = Int(readLine()!){
-            if input < 0{ //check input < 0
-                print("Quantity must more than 0")
-            }else{
-            quantity = input
-            }
+                if input < 0{ //check input < 0
+                    print("Quantity must more than 0")
+                }else{
+                    quantity = input
+                }
         }else{
             print("quantity must be Int")
         }
@@ -422,7 +427,8 @@ func seller(){
         print("| 1.sell Ite      |")
         print("| 2.Re Stock      |")
         print("| 3.Sell List     |")
-        print("| 4.Exit          |")
+        print("| 4.Member        |")
+        print("| 5.Exit          |")
         print("+-----------------+")
         if let input = readLine(){
             switch input{
@@ -433,6 +439,8 @@ func seller(){
                 case "3":
                     showSellList(thisSell: sellList)
                 case "4":
+                    registerMember()
+                case "5":
                     return
                 default:
                     print("error")
@@ -505,6 +513,21 @@ func sellItem(){
             }
         }        
     }while check
+    while true{
+        print("Enter Money : ",terminator: "")
+        if let input = Double(readLine()!){
+            if input < totalPrice{
+                print("Enter correct money")
+            }else{
+                let change = input - totalPrice
+                print(change == 0 ? "No change" : "\(change)")
+                break
+            }
+        }else{
+            print("Input must be Double")
+        }
+    }
+    
     let thisBill = (order,bill,totalPrice)
     if !bill.isEmpty{
         sellList.append(thisBill)//add bill in sellList
@@ -554,13 +577,13 @@ func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quan
     print("|          | ID |   Name   |   Quantity   |  Price   |                 |")
     print("-----------------------------------------------------------------------")
 
-    for sell in thisSell {//
+    for sell in thisSell {//main loop
         let paddedOrderID = String(sell.orderID).padding(toLength: 10, withPad: " ", startingAt: 0)
         let paddedTotal = String(format: "%.2f", sell.total).padding(toLength: 11, withPad: " ", startingAt: 0)
         print("|   \(paddedOrderID) \(String(repeating: " ", count: 56))|")
         print("-----------------------------------------------------------------------")
 
-        for item in sell.items {
+        for item in sell.items {//loop item
             let space = " ".padding(toLength: 10, withPad: " ", startingAt: 0)
             let paddingID = "\(item.id)".padding(toLength: 3, withPad: " ", startingAt: 0)
             let paddingName = item.name.padding(toLength: 8, withPad: " ", startingAt: 0)
@@ -580,10 +603,68 @@ func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quan
     pauseFunc()
 }
 
+//--------------------------Member-------------------------------------------------
+var member:[Int:Member] = [:]
+var userMember:[(id:Int,name:String)] = []
+var memberID = 1
+
+enum Member{
+    case standard,member,VIP
+
+    var discount:Double{
+        switch self{
+            case .VIP:
+                return 0.5
+            case .member:
+                return 0.2
+            case .standard:
+                return 0
+        }
+    }
+}
+
+func registerMember(){
+    print("Register Member")
+    while true{
+        print("Enter Name: ",terminator: "")
+        if let inputName = readLine(){
+            print("choose Membership 1.member 2.VIP : ",terminator: "")
+            var chooseMember = Member.standard
+            check:while true{
+                if let inputMember = readLine(){
+                    switch inputMember{
+                        case "1":
+                            chooseMember = .member
+                        case "2":
+                            chooseMember = .VIP
+                        default:
+                            print("Wrong Input")
+                            continue check
+                    }
+                    break
+                }
+            }
+            let newMemberID = memberID
+            member[newMemberID] = chooseMember
+            userMember.append((id: newMemberID, name: inputName))
+            
+            print("Member registered: ID \(newMemberID), Name \(inputName), Membership \(chooseMember)")
+            memberID += 1 // Increment memberID for the next member
+            print(member)
+            print(userMember)
+            pauseFunc()
+
+            return
+        }
+    }
+}
+
+//--------------------------end Seller---------------------------------------------
+
 //main
 var main = true
 while main {
-    // system("clear")
+    system("clear")
     print("+-----------------+")
     print("| Select Option:  |")
     print("+-----------------+")
@@ -592,6 +673,7 @@ while main {
     print("| 3.Seller        |")
     print("| 4.Exit          |")
     print("+-----------------+")
+
     if let input = readLine() {
         switch input {
         case "1":
