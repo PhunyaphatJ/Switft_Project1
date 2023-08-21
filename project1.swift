@@ -8,7 +8,7 @@ var totalSell:Double = 0
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
 items.append((id:1,name:"items2",quantity:15,price:50))
-items.append((id:2,name:"items3",quantity:5,price:5))
+items.append((id:2,name:"items3",quantity:10,price:100))
 items.append((id:3,name:"items4",quantity:60,price:15))
 items.append((id:4,name:"items5",quantity:35,price:33.3))
 var id = items.count - 1
@@ -513,18 +513,52 @@ func sellItem(){
             }
         }        
     }while check
-    while true{
-        print("Enter Money : ",terminator: "")
-        if let input = Double(readLine()!){
-            if input < totalPrice{
-                print("Enter correct money")
-            }else{
-                let change = input - totalPrice
-                print(change == 0 ? "No change" : "\(change)")
+    var totalWithDiscount:Double = 0
+    calPrice:while true{
+        var selectMember:Member?
+        var memberID:Int?
+        while true{
+            print("Do your have Member[Y|N]: ",terminator: "")
+            if let input = readLine(){
+                switch input{
+                    case "Y","y":
+                        print("Enter member ID: ",terminator: "")
+                        if let inputID = Int(readLine()!){
+                            if let thisID = member[inputID]{
+                                selectMember = thisID
+                                memberID = inputID
+                                break
+                            }else{
+                                print("no member ID")
+                            }
+                        }else{
+                            print("ID must be Int")
+                        }
+                    case "N","n":
+                        return
+                    default:
+                        print("wrong input")
+                }
                 break
             }
-        }else{
-            print("Input must be Double")
+        }
+
+        while true{
+            totalWithDiscount = totalPrice * (1 - (selectMember?.discount ?? 0))
+            print("Price Before discount : \(totalPrice) after : \(totalWithDiscount)")
+            print("Enter Money : ",terminator: "")
+            if let input = Double(readLine()!){
+                if input < totalWithDiscount{
+                    print("Enter correct money")
+                }else{
+                    let change = input - totalWithDiscount
+                    print(change == 0 ? "No change" : "\(change)")
+                    break calPrice
+                }
+            }else{
+                print("Input must be Double")
+            }
+
         }
     }
     
@@ -609,18 +643,17 @@ var userMember:[(id:Int,name:String)] = []
 var memberID = 1
 
 enum Member{
-    case standard,member,VIP
+    case member,VIP
 
     var discount:Double{
         switch self{
             case .VIP:
-                return 0.5
+                return 0.05
             case .member:
-                return 0.2
-            case .standard:
-                return 0
+                return 0.02
         }
     }
+
 }
 
 func registerMember(){
@@ -629,7 +662,7 @@ func registerMember(){
         print("Enter Name: ",terminator: "")
         if let inputName = readLine(){
             print("choose Membership 1.member 2.VIP : ",terminator: "")
-            var chooseMember = Member.standard
+            var chooseMember:Member!
             check:while true{
                 if let inputMember = readLine(){
                     switch inputMember{
