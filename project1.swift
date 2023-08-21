@@ -2,7 +2,9 @@ import Foundation
 
 var user:[(id:String,password:String)] = [(id:"Joe",password:"123")]
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
-var sellList:[[(id:Int,name:String,quantity:Int,price:Double)]] = []
+var sellList: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double)] = []
+var order = 0
+var totalSell:Double = 0
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
 items.append((id:1,name:"items2",quantity:15,price:50))
@@ -52,12 +54,6 @@ func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
      print("|\(space)total : \(stringSum) |")
      print("------------------------------------------")
      return sum
-}
-
-func showSellList(thisSell:[[(id:Int,name:String,quantity:Int,price:Double)]]){
-    for sell in thisSell{
-        showAll(thisItems: sell)
-    }
 }
 
 //------------------------------------------
@@ -425,7 +421,8 @@ func seller(){
         print("| Select Option   |")
         print("| 1.sell Ite      |")
         print("| 2.Re Stock      |")
-        print("| 3.Exit          |")
+        print("| 3.Sell List     |")
+        print("| 4.Exit          |")
         print("+-----------------+")
         if let input = readLine(){
             switch input{
@@ -434,6 +431,8 @@ func seller(){
                 case "2":
                     reStock()
                 case "3":
+                    showSellList(thisSell: sellList)
+                case "4":
                     return
                 default:
                     print("error")
@@ -448,16 +447,17 @@ func bill(){
 
 func sellItem(){
     var check = true
-    var bill:[(id:Int,name:String,quantity:Int,price:Double)] = []
+    var bill:[(id: Int, name: String, quantity: Int, price: Double)] = []
     // system("clear")
     print("+------------+")
     print("|  SellItem  |")
     print("+------------+")
+    var totalPrice:Double = 0
     sell:repeat {
         showAll(thisItems: items)
         bill.sort(by: {$0.id < $1.id})//sorted id 
         showAll(thisItems: bill)
-        total(thisItems: bill)
+        totalPrice = total(thisItems: bill)
         print("Do You want to sell (Y|N): ",terminator: "")
         if let input = readLine(){
             switch input{//case y/n 
@@ -498,17 +498,20 @@ func sellItem(){
                     }else{
                         print("Id must be Int")
                     }
-                case "3":
+                case "N","n":
                     check = false
                 default:
                     print("error")
             }
         }        
     }while check
+    let thisBill = (order,bill,totalPrice)
     if !bill.isEmpty{
-        sellList.append(bill)//add bill in sellList
+        sellList.append(thisBill)//add bill in sellList
+        order += 1
+        totalSell += totalPrice
     }
-    showSellList(thisSell: sellList)
+    // showSellList(thisSell: sellList)
     // print(sellList)
     pauseFunc()
 }
@@ -543,8 +546,39 @@ func reStock(){
         }
     }while true
 }
-//-------------------end seller------------------
 
+func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double)]) {
+    print("+----------------------------------------------------------------------+")
+    print("| Order ID |                  Items                  |      Total      |")
+    print("+----------+-----------------------------------------+-----------------+")
+    print("|          | ID |   Name   |   Quantity   |  Price   |                 |")
+    print("-----------------------------------------------------------------------")
+
+    for sell in thisSell {//
+        let paddedOrderID = String(sell.orderID).padding(toLength: 10, withPad: " ", startingAt: 0)
+        let paddedTotal = String(format: "%.2f", sell.total).padding(toLength: 11, withPad: " ", startingAt: 0)
+        print("|   \(paddedOrderID) \(String(repeating: " ", count: 56))|")
+        print("-----------------------------------------------------------------------")
+
+        for item in sell.items {
+            let space = " ".padding(toLength: 10, withPad: " ", startingAt: 0)
+            let paddingID = "\(item.id)".padding(toLength: 3, withPad: " ", startingAt: 0)
+            let paddingName = item.name.padding(toLength: 8, withPad: " ", startingAt: 0)
+            let paddingQuantity = "\(item.quantity)".padding(toLength: 8, withPad: " ", startingAt: 0)
+            let paddingPrice = "\(item.price)".padding(toLength: 8, withPad: " ", startingAt: 0)
+            print("|\(space)| \(paddingID)|  \(paddingName)|      \(paddingQuantity)|  \(paddingPrice)|\(String(repeating: " ", count: 17))|")
+        }
+
+        let total = "| \(String(repeating: " ", count: 51))|     \(paddedTotal) |"
+        print("|----------------------------------------------------------------------|")
+        print(total)
+        print("+----------------------------------------------------------------------+")
+    }
+    let totalPrice = "\(totalSell)".padding(toLength: 12, withPad: " ", startingAt: 0)
+    print("|\(String(repeating: " ", count: 25))TOTAL SELL\(String(repeating: " ", count: 18))     \(totalPrice)|")
+    print("+----------------------------------------------------------------------+")
+    pauseFunc()
+}
 
 //main
 var main = true
