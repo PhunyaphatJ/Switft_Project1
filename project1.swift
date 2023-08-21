@@ -1,7 +1,7 @@
 import Foundation
 
 var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
-var sellList: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double)] = []
+var sellList: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double,memberID:Int?)] = []
 typealias AnotherInt = Int
 var order:AnotherInt = 0
 var totalSell:Double = 0
@@ -43,23 +43,38 @@ func checkName(thisItems:[(id:Int,name:String,quantity:Int,price:Double)],name:S
     return nil
 }
 
-//total price in bill
-func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
-    var sum:Double = 0
-    for item in thisItems{
-        sum += item.price
+enum CalTotal{
+    case price(Double)
+    indirect case plus(CalTotal,CalTotal)
+
+    func calculate() -> Double {
+        switch self {
+        case .price(let price):
+            return price
+        case .plus(let left, let right):
+            return left.calculate() + right.calculate()
+        }
     }
-     let space = "".padding(toLength: 23, withPad: " ", startingAt: 0)
-     let stringSum = "\(sum)".padding(toLength: 8, withPad: " ", startingAt: 0)
-     print("|\(space)total : \(stringSum) |")
-     print("------------------------------------------")
-     return sum
 }
 
-// enum Member{
-//     case member = 0,noMember = 1
-// }
 
+
+
+//total price in bill
+func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
+   var totalCalculator: CalTotal = .price(0.0)
+    
+    for item in thisItems {
+        totalCalculator = .plus(totalCalculator, .price(item.price))
+    }
+    
+    let total = totalCalculator.calculate()
+     let space = "".padding(toLength: 23, withPad: " ", startingAt: 0)
+     let stringSum = "\(total)".padding(toLength: 8, withPad: " ", startingAt: 0)
+     print("|\(space)total : \(stringSum) |")
+     print("------------------------------------------")
+     return total
+}
 
 //------------------------------------------
 
@@ -424,7 +439,7 @@ func seller(){
         system("clear")
           print("+---------------+")
         print("| Select Option   |")
-        print("| 1.sell Ite      |")
+        print("| 1.sell Item     |")
         print("| 2.Re Stock      |")
         print("| 3.Sell List     |")
         print("| 4.Member        |")
@@ -514,10 +529,10 @@ func sellItem(){
         }        
     }while check
     var totalWithDiscount:Double = 0
+    var memberID:Int?
     calPrice:while true{
         var selectMember:Member?
-        var memberID:Int?
-        while true{
+        memberLoop:while true{
             print("Do your have Member[Y|N]: ",terminator: "")
             if let input = readLine(){
                 switch input{
@@ -527,17 +542,20 @@ func sellItem(){
                             if let thisID = member[inputID]{
                                 selectMember = thisID
                                 memberID = inputID
+                                print("ID: \(memberID!) Name: \(userMember[inputID - 1].name) Member Type: \(selectMember!)")
                                 break
                             }else{
                                 print("no member ID")
+                                continue memberLoop
                             }
                         }else{
                             print("ID must be Int")
                         }
                     case "N","n":
-                        return
+                         break
                     default:
                         print("wrong input")
+                        continue memberLoop
                 }
                 break
             }
@@ -545,7 +563,7 @@ func sellItem(){
 
         while true{
             totalWithDiscount = totalPrice * (1 - (selectMember?.discount ?? 0))
-            print("Price Before discount : \(totalPrice) after : \(totalWithDiscount)")
+            print(selectMember != nil ? "Price Before discount : \(totalPrice) after : \(totalWithDiscount)" : "Price :\(totalWithDiscount)")
             print("Enter Money : ",terminator: "")
             if let input = Double(readLine()!){
                 if input < totalWithDiscount{
@@ -562,11 +580,11 @@ func sellItem(){
         }
     }
     
-    let thisBill = (order,bill,totalPrice)
+    let thisBill = (order,bill,totalWithDiscount,memberID)
     if !bill.isEmpty{
         sellList.append(thisBill)//add bill in sellList
         order += 1
-        totalSell += totalPrice
+        totalSell += totalWithDiscount
     }
     // showSellList(thisSell: sellList)
     // print(sellList)
@@ -604,7 +622,7 @@ func reStock(){
     }while true
 }
 
-func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double)]) {
+func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double,memberID:Int?)]) {
     print("+----------------------------------------------------------------------+")
     print("| Order ID |                  Items                  |      Total      |")
     print("+----------+-----------------------------------------+-----------------+")
@@ -612,9 +630,16 @@ func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quan
     print("-----------------------------------------------------------------------")
 
     for sell in thisSell {//main loop
-        let paddedOrderID = String(sell.orderID).padding(toLength: 10, withPad: " ", startingAt: 0)
-        let paddedTotal = String(format: "%.2f", sell.total).padding(toLength: 11, withPad: " ", startingAt: 0)
-        print("|   \(paddedOrderID) \(String(repeating: " ", count: 56))|")
+        let paddingOrderID = String(sell.orderID).padding(toLength: 10, withPad: " ", startingAt: 0)
+        let paddingTotal = String(format: "%.2f", sell.total).padding(toLength: 11, withPad: " ", startingAt: 0)
+        let paddingMember:String
+        if let member = sell.memberID{
+            paddingMember = "\(member)".padding(toLength: 6, withPad: " ", startingAt: 0)
+
+        }else{
+            paddingMember = "nil   "
+        }
+        print("|   \(paddingOrderID) \(String(repeating: " ", count: 40))MemberID: \(paddingMember)|")
         print("-----------------------------------------------------------------------")
 
         for item in sell.items {//loop item
@@ -626,7 +651,7 @@ func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quan
             print("|\(space)| \(paddingID)|  \(paddingName)|      \(paddingQuantity)|  \(paddingPrice)|\(String(repeating: " ", count: 17))|")
         }
 
-        let total = "| \(String(repeating: " ", count: 51))|     \(paddedTotal) |"
+        let total = "| \(String(repeating: " ", count: 51))|     \(paddingTotal) |"
         print("|----------------------------------------------------------------------|")
         print(total)
         print("+----------------------------------------------------------------------+")
@@ -662,7 +687,7 @@ func registerMember(){
         print("Enter Name: ",terminator: "")
         if let inputName = readLine(){
             print("choose Membership 1.member 2.VIP : ",terminator: "")
-            var chooseMember:Member!
+            var chooseMember:Member = .member
             check:while true{
                 if let inputMember = readLine(){
                     switch inputMember{
@@ -683,8 +708,6 @@ func registerMember(){
             
             print("Member registered: ID \(newMemberID), Name \(inputName), Membership \(chooseMember)")
             memberID += 1 // Increment memberID for the next member
-            print(member)
-            print(userMember)
             pauseFunc()
 
             return
@@ -697,7 +720,7 @@ func registerMember(){
 //main
 var main = true
 while main {
-    system("clear")
+    // system("clear")
     print("+-----------------+")
     print("| Select Option:  |")
     print("+-----------------+")
