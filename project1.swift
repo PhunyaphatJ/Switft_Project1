@@ -448,7 +448,7 @@ func pauseFunc(){
 func seller(){
     while true{
         system("clear")
-          print("+---------------+")
+        print("+---------------+")
         print("| Select Option   |")
         print("| 1.sell Item     |")
         print("| 2.Re Stock      |")
@@ -465,7 +465,7 @@ func seller(){
                 case "3":
                     showSellList(thisSell: sellList)
                 case "4":
-                    registerMember()
+                    memberFunc()
                 case "5":
                     return
                 default:
@@ -694,6 +694,35 @@ enum Member{
 
 }
 
+func memberFunc(){
+        while true{
+            system("clear")
+            print("+-----------------------+")
+            print("| Select Option         |")
+            print("| 1.Register Member     |")
+            print("| 2.Re-Name             |")
+            print("| 3.Show Member         |")
+            print("| 4.Exit                |")
+            print("+-----------------------+")
+            if let input = readLine(){
+                switch input{
+                    case "1":
+                        registerMember()
+                    case "2":
+                        reNameMember()
+                    case "3":
+                        showMember()
+                    case "4":
+                        return 
+                    default:
+                        print("worng input")
+                        pauseFunc()
+                }
+            }
+
+        }
+}
+
 func registerMember(){
     print("Register Member")
     while true{
@@ -728,18 +757,76 @@ func registerMember(){
     }
 }
 
+func reName(name:inout String){
+    while true{
+        print("Enter your new Name: ",terminator: "")
+        if let inputName = readLine(){
+
+            print("Do your ok with this Name: \(inputName) [Y:N] : ",terminator: "")
+            if let input = readLine(){
+                switch input{
+                    case "Y","y":
+                        name = inputName
+                        return
+                    case "N","n":
+                        continue
+                    default:
+                        print("wrong input")
+                }
+            }
+        }
+    }
+}
+
+func reNameMember(){
+    mainRE:while true{
+        print("Do you want to re Name [Y:N]: ")
+        if let input = readLine(){
+            switch input{
+                case "Y","y":
+                    ID:while true{
+                        print("input Member ID : ",terminator: "")
+                        if let inputID = Int(readLine()!){
+                            if userMember.contains(where: {$0.id == inputID}){
+                                print("Member Name: \(userMember[inputID - 1].name)")
+                                reName(name: &userMember[inputID - 1].name)
+                                return
+                            }else{
+                                print("Dont have this ID")
+                                continue mainRE
+                            }
+                        }else{
+                            print("ID Must be Int")
+                        }
+                    }
+
+                case "N","n":
+                    return
+                default:
+                    print("wrong input")     
+            }
+        }
+    }
+}
+
+func showMember(){
+    for member in userMember{
+        print(member)
+    }
+    pauseFunc()
+}
 //--------------------------end Seller---------------------------------------------
 
 //main
 var main = true
 while main {
-    // system("clear")
+    system("clear")
     print("+-----------------+")
     print("| Select Option:  |")
     print("+-----------------+")
     print("| 1.Create /Remove|")
     print("| 2.Show Items    |")
-    print("| 3.Seller        |")
+    print("| 3.Sell          |")
     print("| 4.Exit          |")
     print("+-----------------+")
 
