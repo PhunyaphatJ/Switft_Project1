@@ -4,7 +4,8 @@ var items:[(id:Int,name:String,quantity:Int,price:Double)] = []
 var sellList: [(orderID: Int, items: [(id: Int, name: String, quantity: Int, price: Double)], total: Double,memberID:Int?)] = []
 typealias AnotherInt = Int
 var order:AnotherInt = 0
-var totalSell:Double = 0
+// var totalSell:CalTotal = .price(0.0)
+var totalSell:[()->Double] = []
 //for test
 items.append((id:0,name:"items1",quantity:30,price:20.0))
 items.append((id:1,name:"items2",quantity:15,price:50))
@@ -57,9 +58,6 @@ enum CalTotal{
     }
 }
 
-
-
-
 //total price in bill
 func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
    var totalCalculator: CalTotal = .price(0.0)
@@ -74,6 +72,19 @@ func total(thisItems:[(id:Int,name:String,quantity:Int,price:Double)])->Double{
      print("|\(space)total : \(stringSum) |")
      print("------------------------------------------")
      return total
+}
+
+func totalSellEscaping(function:@autoclosure @escaping()->Double){
+    totalSell.append(function)
+}
+
+func excuteTotalSell()->Double{
+    var sum:CalTotal = .price(0.0)
+
+    for total in totalSell{
+        sum = .plus(sum, .price(total()))
+    }
+    return sum.calculate()
 }
 
 //------------------------------------------
@@ -471,12 +482,12 @@ func bill(){
 func sellItem(){
     var check = true
     var bill:[(id: Int, name: String, quantity: Int, price: Double)] = []
-    // system("clear")
-    print("+------------+")
-    print("|  SellItem  |")
-    print("+------------+")
     var totalPrice:Double = 0
     sell:repeat {
+        system("clear")
+        print("+------------+")
+        print("|  SellItem  |")
+        print("+------------+")
         showAll(thisItems: items)
         bill.sort(by: {$0.id < $1.id})//sorted id 
         showAll(thisItems: bill)
@@ -584,7 +595,9 @@ func sellItem(){
     if !bill.isEmpty{
         sellList.append(thisBill)//add bill in sellList
         order += 1
-        totalSell += totalWithDiscount
+        // totalSell = .plus(totalSell, .price(totalWithDiscount))
+        totalSellEscaping(function: totalWithDiscount)
+
     }
     // showSellList(thisSell: sellList)
     // print(sellList)
@@ -656,7 +669,7 @@ func showSellList(thisSell: [(orderID: Int, items: [(id: Int, name: String, quan
         print(total)
         print("+----------------------------------------------------------------------+")
     }
-    let totalPrice = "\(totalSell)".padding(toLength: 12, withPad: " ", startingAt: 0)
+    let totalPrice = "\(excuteTotalSell())".padding(toLength: 12, withPad: " ", startingAt: 0)
     print("|\(String(repeating: " ", count: 25))TOTAL SELL\(String(repeating: " ", count: 18))     \(totalPrice)|")
     print("+----------------------------------------------------------------------+")
     pauseFunc()
